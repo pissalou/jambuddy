@@ -1,0 +1,11 @@
+X:1
+T:1 rd Movement K. 331 Rondo alla Turca
+L:1/4
+Q:1/4=120
+M:2/4
+K:C
+V:1 treble nm="Piano"
+%%MIDI program 0
+V:1
+(B/4A/4^G/4A/4 | .c/) z/ (d/4c/4B/4c/4 | .e/) z/ (f/4e/4^d/4e/4 | b/4a/4^g/4a/4 b/4a/4^g/4a/4 | %4
+ c') .a/.c'/ |{ga} .b/.[^fa]/.[eg]/.[^fa]/ |{ga} .b/.[^fa]/.[eg]/.[^fa]/ |{ga} .b/.[^fa]/.[eg]/.[^d^f]/ |] %8

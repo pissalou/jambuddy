@@ -1,0 +1,5 @@
+keyboard        # for playing virtual piano
+mido
+mingus          # for detecting chords
+python-rtmidi
+pytest
