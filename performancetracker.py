@@ -63,9 +63,9 @@ print(f'Input devices: {mido.get_input_names()}')
 port_in = mido.open_input(mido.get_input_names()[0])
 
 
-def filtered_receive(port, message_type='note_on'):
+def filtered_receive(port, message_types=set('note_on', 'note_off')):
     received_event = port.receive()
-    if received_event.type == message_type:
+    if received_event.type in message_types:
         return received_event
     return port.receive()
 
@@ -76,7 +76,7 @@ def play_back():
 
 
 # Poor man's play_at_beat
-mid._merged_track = mid._merged_track[81:]  # TODO: start at beat no. 2 of the riff
+mid._merged_track = mid._merged_track[81:]  # TODO: calculate where to find beat no. 2 of the riff
 mid._merged_track = mido.merge_tracks(mid.tracks[2:])  # Remove Track no. 1
 
 
@@ -93,7 +93,10 @@ def fraction2second(fraction: Fraction) -> float:
 while True:
     print(f'\rExpecting {midi2abc(melody[melody_note_idx].note)}{melody[melody_note_idx].time}\tCalculated tempo: {calculated_tempo_bps * 60:.2f}', end='')
     # print(f'Expecting note {melody[melody_note_idx].note} in    {expected_note_duration if melody_note_idx != 0 else 0:.2f}s...')
-    received_event = filtered_receive(port_in, message_type='note_on')
+    received_event = filtered_receive(port_in)
+    if received_event.type == 'note_off':
+        port_out.send(received_event)
+        continue
     if melody_note_idx == 0 and previous_time == 0:
         previous_time = time.time()
     else:
@@ -102,7 +105,7 @@ while True:
         seconds_since_previous_note = time.time() - previous_time
         calculated_tempo_bps = (previous_note_expected_length / seconds_since_previous_note)
         current_bpm = calculated_tempo_bps * 60 if 1.8 < calculated_tempo_bps < 2.1 else current_bpm  # TODO: TempoTracker
-    # print(f'Received note  {received_event.note} after {previous_note_duration:.2f}s')
+    # print(f'Received note  {received_event.note} after {seconds_since_previous_note:.2f}s')
     previous_time = time.time()
     port_out.send(received_event)
     melody_note_idx = (melody_note_idx + 1) % len(melody)

@@ -3,3 +3,4 @@ mido
 mingus          # for detecting chords
 python-rtmidi
 pytest
+pytest-mock
