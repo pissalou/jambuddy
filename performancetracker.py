@@ -2,6 +2,7 @@ import threading
 
 import mido
 from mido import MidiFile, Message, second2tick, tempo2bpm, bpm2tempo, tick2second
+from performance import PerformanceTracker
 import time
 from time import strftime, gmtime
 from fractions import Fraction
@@ -47,15 +48,7 @@ print('Playback duration: ' + strftime("%M:%S", gmtime(mid.length)))
 # print notes in track 1
 
 # note times are in fractions of a quarter note (to be more compliant with ABC notation)
-melody = [Message('note_on', channel=0, note=40, velocity=80, time=Fraction('1/2')),
-          Message('note_on', channel=0, note=40, velocity=80, time=Fraction('1/2')),
-          Message('note_on', channel=0, note=42, velocity=80, time=Fraction('1/2')),
-          Message('note_on', channel=0, note=40, velocity=80, time=Fraction('1/2')),
-          Message('note_on', channel=0, note=43, velocity=80, time=Fraction('1/4')),
-          Message('note_on', channel=0, note=44, velocity=80, time=Fraction('1/4')),
-          Message('note_on', channel=0, note=40, velocity=80, time=Fraction('1/2')),
-          Message('note_on', channel=0, note=45, velocity=80, time=Fraction('1/2')),
-          Message('note_on', channel=0, note=44, velocity=80, time=Fraction('1/2'))]
+melody = ["E/2", "E/2", "^F/2", "E/2", "G/4", "^G/4", "E/2", "A/2", "^G/2"]
 melody_start = 3840  # in ticks
 
 
@@ -63,14 +56,14 @@ print(f'Input devices: {mido.get_input_names()}')
 port_in = mido.open_input(mido.get_input_names()[0])
 
 
-def filtered_receive(port, message_types=set('note_on', 'note_off')):
-    received_event = port.receive()
+def filtered_receive(port, message_types=['note_on', 'note_off']):
+    received_event = port.process()
     if received_event.type in message_types:
         return received_event
-    return port.receive()
+    return port.process()
 
 
-def play_back():
+def playback():
     for msg in mid.play():
         port_out.send(msg)
 
@@ -90,37 +83,12 @@ def fraction2second(fraction: Fraction) -> float:
     return fraction / calculated_tempo_bps
 
 
-while True:
-    print(f'\rExpecting {midi2abc(melody[melody_note_idx].note)}{melody[melody_note_idx].time}\tCalculated tempo: {calculated_tempo_bps * 60:.2f}', end='')
-    # print(f'Expecting note {melody[melody_note_idx].note} in    {expected_note_duration if melody_note_idx != 0 else 0:.2f}s...')
-    received_event = filtered_receive(port_in)
-    if received_event.type == 'note_off':
-        port_out.send(received_event)
-        continue
-    if melody_note_idx == 0 and previous_time == 0:
-        previous_time = time.time()
-    else:
-        previous_note_expected_length = melody[melody_note_idx - 1].time  # in fraction
-        previous_note_expected_duration = fraction2second(previous_note_expected_length)  # in seconds
-        seconds_since_previous_note = time.time() - previous_time
-        calculated_tempo_bps = (previous_note_expected_length / seconds_since_previous_note)
-        current_bpm = calculated_tempo_bps * 60 if 1.8 < calculated_tempo_bps < 2.1 else current_bpm  # TODO: TempoTracker
-    # print(f'Received note  {received_event.note} after {seconds_since_previous_note:.2f}s')
-    previous_time = time.time()
-    port_out.send(received_event)
-    melody_note_idx = (melody_note_idx + 1) % len(melody)
-    # TODO start playing the other tracks at the calculated tempo
-    if melody_note_idx == 3 and not playback_started:
-        # mid.play_at(melody_start + second2tick((melody[1].time + melody[2].time + melody[3].time) / tempo_bps))
-        # pass
-        playback_started = True
-        playback_thread = threading.Thread(target=play_back)
+def midi_message_received_callback(self):
+    if self.melody_note_idx == 3 and not self.playback_started:
+        self.playback_started = True
+        playback_thread = threading.Thread(target=playback)
         playback_thread.start()
 
-for msg in melody:
-    port_out.send(msg)
-    time.sleep(msg.time)
 
-
-for msg in mid.play():
-    port_out.send(msg)
+performance_tracker = PerformanceTracker(expected_melody=melody, tempo_bpm=original_bpm, port_in=port_in, port_out=port_out, midi_message_received_callback=midi_message_received_callback)
+performance_tracker.start()

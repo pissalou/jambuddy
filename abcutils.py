@@ -41,6 +41,7 @@ ACCIDENTALS_TO_SCALE = {
 # TODO: eventually return a tuple note_on/note_off
 def abc2midi(txt, accidentals=0, unit_note_length=Fraction(1, 4), time_signature=(4, 4)) -> mido.Message:
     """ txt is a single note in ABC notation [https://abcnotation.com/] """
+    # TODO: investigate the time_signature thing
     key = re.findall(r"[^_]*[A-G]", txt, flags=re.IGNORECASE)[0]  # eg C, ^D, __E
     octave_up = len(re.findall(r"'", txt))   # eg C''
     octave_down = len(re.findall(r",", txt))  # eg C,,
@@ -50,7 +51,7 @@ def abc2midi(txt, accidentals=0, unit_note_length=Fraction(1, 4), time_signature
         octave = octave + 1 if key.islower() else octave  # it seems counterintuitive but it is how abc notations work
     except IndexError:
         raise ValueError('The key is not valid', key)
-    return mido.Message(type='note_on', note=pos + 12 * (int(octave) + 1), time=(Fraction(abc2beatcount(txt)) * unit_note_length.denominator) / time_signature[1])
+    return mido.Message(type='note_on', note=pos + 12 * (int(octave) + 1), time=(Fraction(abc2beatcount(txt)) * unit_note_length))
 
 
 # TODO: dynamics2velocity
