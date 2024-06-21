@@ -3,12 +3,13 @@ import time
 import typing
 from fractions import Fraction
 from mido import Message
-from abcutils import abc2midi
+from tempo import TempoTracker
+from abcutils import abc2beatcount
 from midiplayback import MidiPlayback
 import mido
 
 
-def filtered_receive(port, message_types=['note_on', 'note_off']):
+def filtered_receive(port, message_types=('note_on', 'note_off')):
     received_event = port.process()
     if received_event.type in message_types:
         return received_event
@@ -28,6 +29,7 @@ class PerformanceTracker(threading.Thread):
         self.previous_time = 0
         self.playback_started = False
         self.midi_message_received_callback = midi_message_received_callback
+        self.tempo_tracker = TempoTracker([abc2beatcount(note) for note in expected_melody], tempo_bpm)
 
     def _fraction2second(self, fraction: Fraction) -> float:
         return fraction / self.current_bps
@@ -41,14 +43,9 @@ class PerformanceTracker(threading.Thread):
             return
         if self.melody_note_idx == 0 and self.previous_time == 0:
             self.previous_time = time.time()  # start measuring time
-        else:
-            previous_note_expected_length = abc2midi(self.melody[self.melody_note_idx - 1]).time  # time is in fraction
-            previous_note_expected_duration = self._fraction2second(previous_note_expected_length)  # time in seconds
-            seconds_since_previous_note = time.time() - self.previous_time
-            calculated_tempo_bps = (previous_note_expected_length / seconds_since_previous_note)
-            self.current_bps = calculated_tempo_bps if 1.8 < calculated_tempo_bps < 2.1 else self.current_bps  # TODO: TempoTracker
-        # print(f'Received note  {received_event.note} after {seconds_since_previous_note:.2f}s')
-        previous_time = time.time()
+        calculated_tempo_bps, tempo_deviation = self.tempo_tracker.process(midi_msg)
+        print(f' {calculated_tempo_bps * 60:.2f} deviation {tempo_deviation * 100}%', end='')
+        self.current_bps = calculated_tempo_bps
         self.port_out.send(received_event)
         self.melody_note_idx = (self.melody_note_idx + 1) % len(self.melody)
         # start playing the other tracks at the calculated tempo
@@ -61,5 +58,5 @@ class PerformanceTracker(threading.Thread):
 
     def run(self):
         while True:
-            msg = self.port_in.process()
+            msg = self.port_in.receive()
             self.process(msg)
