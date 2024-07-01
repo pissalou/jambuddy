@@ -7,6 +7,7 @@ from tempo import TempoTracker
 from abcutils import abc2beatcount
 from midiplayback import MidiPlayback
 import mido
+import globals
 
 
 def filtered_receive(port, message_types=('note_on', 'note_off')):
@@ -40,15 +41,17 @@ class PerformanceTracker(threading.Thread):
         received_event = midi_msg
         if received_event.type == 'note_off':
             self.port_out.send(received_event)
+            # print(f' {self.current_bps * 60:.2f}', end='')
             return
         if self.melody_note_idx == 0 and self.previous_time == 0:
             self.previous_time = time.time()  # start measuring time
         calculated_tempo_bps, tempo_deviation = self.tempo_tracker.process(midi_msg)
-        print(f' {calculated_tempo_bps * 60:.2f} deviation {tempo_deviation * 100}%', end='')
+        print(f' {calculated_tempo_bps * 60:.2f} deviation {round(tempo_deviation * 100)}%', end='')
         self.current_bps = calculated_tempo_bps
         self.port_out.send(received_event)
         self.melody_note_idx = (self.melody_note_idx + 1) % len(self.melody)
         # start playing the other tracks at the calculated tempo
+        globals.current_bpm = self.current_bps * 60
         if self.midi_message_received_callback:
             self.midi_message_received_callback(self)
 

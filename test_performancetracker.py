@@ -63,6 +63,7 @@ def test_melody_played_as_expected():
     port_mock.send.assert_has_calls([call(midi_msg) for midi_msg in as_midi_performance(played_melody)])
 
 
+# TODO test_chord_does_not_raise_divisionbyzero
 def test_melody_played_with_omission():
     played_melody = copy.deepcopy(DEFAULT_MELODY)
     played_melody[4] = 'G/2'  # was 'G/4'

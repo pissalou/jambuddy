@@ -1,5 +1,5 @@
 import threading
-
+# TODO rename file main.py
 import mido
 from mido import MidiFile, Message, second2tick, tempo2bpm, bpm2tempo, tick2second
 from performance import PerformanceTracker
@@ -7,19 +7,17 @@ import time
 from time import strftime, gmtime
 from fractions import Fraction
 from abcutils import midi2abc
-
-current_bpm = 116
+import globals
 
 
 class TimeStretchableMidiFile(MidiFile):
 
     def __iter__(self):
-        global current_bpm
         absolute_time = 0
         for msg in self.merged_track:
             # Convert message time from absolute time in ticks to relative time in seconds.
             if msg.time > 0:
-                delta = tick2second(msg.time, self.ticks_per_beat, bpm2tempo(current_bpm))
+                delta = tick2second(msg.time, self.ticks_per_beat, bpm2tempo(globals.current_bpm))
             else:
                 delta = 0
             absolute_time += msg.time
@@ -27,8 +25,8 @@ class TimeStretchableMidiFile(MidiFile):
             yield msg.copy(skip_checks=True, time=delta)
             # yield MetaMessage(**vars(msg)) if msg.is_meta else Message(**(vars(msg) | {'data': absolute_time}))
 
-            if msg.type == 'set_tempo':
-                current_bpm = tempo2bpm(msg.tempo)
+            # if msg.type == 'set_tempo':
+            #     globals.current_bpm = tempo2bpm(msg.tempo)
 
 
 # IMPORTANT plug a midi keyboard at this point
@@ -40,7 +38,7 @@ mid = TimeStretchableMidiFile("C:\\Users\\mazars\\Downloads\\The Blues Brothers-
 meta_msgs = [msg for msg in list(mid) if msg.is_meta]
 print('Track Names: ' + ','.join([meta_msg.name for meta_msg in meta_msgs if meta_msg.type == 'track_name']))
 original_bpm = mido.tempo2bpm([meta_msg.tempo for meta_msg in meta_msgs if meta_msg.type == 'set_tempo'][0])
-print('BPM: ' + str(round(original_bpm)))
+print('Original BPM: ' + str(round(original_bpm)))
 time_signature = [meta_msg for meta_msg in meta_msgs if meta_msg.type == 'time_signature'][0]
 print('Signature: ' + str(time_signature.numerator) + '/' + str(time_signature.denominator))
 # print('Key: ' + [meta_msg.key for meta_msg in meta_msgs if meta_msg.type == 'key_signature'][0])
@@ -48,7 +46,8 @@ print('Playback duration: ' + strftime("%M:%S", gmtime(mid.length)))
 # print notes in track 1
 
 # note times are in fractions of a quarter note (to be more compliant with ABC notation)
-melody = ["E/2", "E/2", "^F/2", "E/2", "G/4", "^G/4", "E/2", "A/2", "^G/2"]
+# melody = ["E/2", "E/2", "^F/2", "E/2", "G/4", "^G/4", "E/2", "A/2", "^G/2"]
+melody = ["E/2", "E/2", "E/2", "E/2"]  # Super simplified melody
 melody_start = 3840  # in ticks
 
 
@@ -90,5 +89,5 @@ def midi_message_received_callback(self):
         playback_thread.start()
 
 
-performance_tracker = PerformanceTracker(expected_melody=melody, tempo_bpm=original_bpm, port_in=port_in, port_out=port_out, midi_message_received_callback=midi_message_received_callback)
+performance_tracker = PerformanceTracker(expected_melody=melody, tempo_bpm=globals.current_bpm, port_in=port_in, port_out=port_out, midi_message_received_callback=midi_message_received_callback)
 performance_tracker.start()

@@ -1,9 +1,17 @@
-See https://mido.readthedocs.io/en/stable/
+JAMBUDDY
+========
+Based on the mido library. See https://mido.readthedocs.io/en/stable/
 
 
-Play a arpeggio in C:
----------------------
+Getting started:
+----------------
+```
+pip install -r requirements.txt
+```
 
+Play an arpeggio in C:
+----------------------
+```
 import mido
 import time
 port = mido.open_output(mido.get_output_names()[0])
@@ -12,9 +20,10 @@ for note in [60, 64, 67, 72]:
     time.sleep(mido.tick2second(480, 480, mido.bpm2tempo(120)))
     port.send(mido.Message('note_off', note=note))
 port.close()
-
+```
 Read MIDI file:
 ---------------
+```
 import mido
 from mido import MidiFile
 from time import gmtime, strftime
@@ -32,7 +41,9 @@ mid._merged_track = mido.merge_tracks(mid.tracks[1:2]) # keep only Track no. 1
 for msg in mid.play():
     port.send(msg)
 port.close()
-
+```
 Panic:
 ------
+```
 port.panic()
+```

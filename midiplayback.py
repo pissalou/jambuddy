@@ -1,7 +1,8 @@
 from mido import MidiFile, MidiTrack, tick2second, bpm2tempo, tempo2bpm, merge_tracks
 import sys
 
-from __init__ import current_bpm
+import midiutils
+from globals import current_bpm
 
 
 def _first_note_time(track: MidiTrack):
@@ -26,9 +27,10 @@ class MidiPlayback(MidiFile):
         first_note_time = _first_note_time(self.tracks[melody_track])
         self.start_position = (start_position * self.ticks_per_beat) + first_note_time
         self.stop_position = (stop_position * self.ticks_per_beat) + first_note_time if stop_position > start_position else sys.maxsize
+        #self.original_bpm = midiutils.extract_bpm(self)
 
     def __iter__(self):
-        global current_bpm
+        global current_bpm  # TODO: cleaner code
         absolute_time = 0
         first_note_encountered = False
         for msg in self.merged_track:

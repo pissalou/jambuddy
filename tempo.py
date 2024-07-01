@@ -11,7 +11,7 @@ class TempoTracker(threading.Thread):
     The assumption made here is that the melody received is played without any omission or insertion.
     """
 
-    def __init__(self, expected_rhythm, tempo_bpm=120, allowed_tempo_deviation=0.05, port_in=None, port_out=None):
+    def __init__(self, expected_rhythm, tempo_bpm=120, allowed_tempo_deviation=1, port_in=None, port_out=None):
         """ Rhythm is a list of fractions """
         super().__init__()
         self.rhythm = expected_rhythm
@@ -31,7 +31,7 @@ class TempoTracker(threading.Thread):
         calculated_tempo_bps = 0
         tempo_deviation = 0
         if self.rhythm_idx != 0 and self.previous_time is not None:
-            previous_note_expected_length = self.rhythm[self.rhythm_idx - 1]  # rhythm element is a fraction
+            previous_note_expected_length = self.rhythm[self.rhythm_idx % len(self.rhythm) - 1]  # length is a fraction
             previous_note_expected_duration = self._fraction2second(previous_note_expected_length)  # time in seconds
             seconds_since_previous_note = time.time() - self.previous_time
             calculated_tempo_bps = (previous_note_expected_length / seconds_since_previous_note)

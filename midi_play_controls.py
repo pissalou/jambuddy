@@ -43,7 +43,7 @@ class TimeStretchableMidiFile(MidiFile):
         idx = 1
         for idx, msg in enumerate(self):
             # if hasattr(msg, 'data') and msg.data > ((beat - 1) / (current_bpm / 60)):
-            if msg.absolute_tim3 > ((beat - 1) / (current_bpm / 60)):
+            if msg.absolute_time > ((beat - 1) / (current_bpm / 60)):
                 return
         self._merged_track = self._merged_track[idx - 1:]
         return self.play(meta_messages=meta_messages, now=now)
