@@ -5,8 +5,6 @@ from fractions import Fraction
 from mido import Message
 from tempo import TempoTracker
 from abcutils import abc2beatcount
-from midiplayback import MidiPlayback
-import mido
 import globals
 
 

@@ -1,8 +1,6 @@
 from mido import MidiFile, MidiTrack, tick2second, bpm2tempo, tempo2bpm, merge_tracks
 import sys
-
-import midiutils
-from globals import current_bpm
+import globals
 
 
 def _first_note_time(track: MidiTrack):
@@ -19,7 +17,8 @@ class MidiPlayback(MidiFile):
         """
         :param filename: the name of the midifile
         :param melody_track: the index of the track to use for melody reference, it will be muted during playback
-        :param start_position: position relative to the start of the melody in melody_track in number of beats (TODO midi beats)
+        :param start_position: position relative to the start of the melody in melody_track in number of beats (TODO midi beats?) 0-based or 1-based?
+        :param stop_position: position relative to the start of the melody in melody_track in number of beats (TODO midi beats?)  0-based or 1-based?
         """
         super().__init__(filename)
         self._merged_track = merge_tracks(self.tracks[:melody_track] + self.tracks[melody_track + 1:])  # mute the melody_track
@@ -27,10 +26,9 @@ class MidiPlayback(MidiFile):
         first_note_time = _first_note_time(self.tracks[melody_track])
         self.start_position = (start_position * self.ticks_per_beat) + first_note_time
         self.stop_position = (stop_position * self.ticks_per_beat) + first_note_time if stop_position > start_position else sys.maxsize
-        #self.original_bpm = midiutils.extract_bpm(self)
+        # self.original_bpm = midiutils.extract_bpm(self)
 
     def __iter__(self):
-        global current_bpm  # TODO: cleaner code
         absolute_time = 0
         first_note_encountered = False
         for msg in self.merged_track:
@@ -44,12 +42,13 @@ class MidiPlayback(MidiFile):
                 first_note_encountered = True
             # Convert message time from absolute time in ticks to relative time in seconds.
             if msg.time > 0:
-                delta = tick2second(msg.time, self.ticks_per_beat, bpm2tempo(current_bpm))
+                delta = tick2second(msg.time, self.ticks_per_beat, bpm2tempo(globals.current_bpm))
             else:
                 delta = 0
             # print('\r%5.2f'% (absolute_time / self.ticks_per_beat), end='')
             yield msg.copy(skip_checks=True, time=delta)
             # yield MetaMessage(**vars(msg)) if msg.is_meta else Message(**(vars(msg) | {'data': absolute_time}))
 
-            if msg.type == 'set_tempo':
-                current_bpm = tempo2bpm(msg.tempo)
+            # TODO: support tempo changes
+            # if msg.type == 'set_tempo':
+            #     current_bpm = tempo2bpm(msg.tempo)

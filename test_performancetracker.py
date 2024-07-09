@@ -64,6 +64,9 @@ def test_melody_played_as_expected():
 
 
 # TODO test_chord_does_not_raise_divisionbyzero
+#   File "C:\code\mido-melody-extractor\tempo.py", line 37, in process
+#     calculated_tempo_bps = (previous_note_expected_length / seconds_since_previous_note)
+
 def test_melody_played_with_omission():
     played_melody = copy.deepcopy(DEFAULT_MELODY)
     played_melody[4] = 'G/2'  # was 'G/4'
