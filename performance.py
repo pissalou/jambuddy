@@ -4,6 +4,7 @@ import typing
 from fractions import Fraction
 from mido import Message
 from tempo import TempoTracker
+from abccoloramaview import AbcColoramaView
 from abcutils import abc2beatcount
 import globals
 
@@ -25,10 +26,11 @@ class PerformanceTracker(threading.Thread):
         self.port_in = port_in
         self.port_out = port_out
         self.melody_note_idx = 0
-        self.previous_time = 0
+        self.previous_time = 0.0
         self.playback_started = False
         self.midi_message_received_callback = midi_message_received_callback
         self.tempo_tracker = TempoTracker([abc2beatcount(note) for note in expected_melody], tempo_bpm)
+        self.view = AbcColoramaView(melody=expected_melody, bpm=tempo_bpm)
 
     def _fraction2second(self, fraction: Fraction) -> float:
         return fraction / self.current_bps
@@ -44,13 +46,14 @@ class PerformanceTracker(threading.Thread):
         if self.melody_note_idx == 0 and self.previous_time == 0:
             self.previous_time = time.time()  # start measuring time
         calculated_tempo_bps, tempo_deviation = self.tempo_tracker.process(midi_msg)
-        print(f' {calculated_tempo_bps * 60:.2f} deviation {round(tempo_deviation * 100)}%', end='')
-        self.current_bps = calculated_tempo_bps
+        print(f'-- {calculated_tempo_bps * 60:.2f} deviation {round(tempo_deviation * 100)}%', end='')
+        if tempo_deviation < 0.3:  # TODO not duplicate logic from tempo tracker
+            self.current_bps = calculated_tempo_bps
         self.port_out.send(received_event)
         self.melody_note_idx = (self.melody_note_idx + 1) % len(self.melody)
         # start playing the other tracks at the calculated tempo
         globals.current_bpm = self.current_bps * 60
-        if self.midi_message_received_callback:
+        if self.midi_message_received_callback is not None:
             self.midi_message_received_callback(self)
 
     @property

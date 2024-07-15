@@ -1,6 +1,7 @@
-keyboard        # for playing virtual piano
 mido
-mingus          # for detecting chords
 python-rtmidi
+keyboard        # for playing virtual piano
+mingus          # for detecting chords
+colorama        # for printing notes with colors
 pytest
 pytest-mock

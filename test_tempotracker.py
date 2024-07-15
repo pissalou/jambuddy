@@ -57,3 +57,12 @@ def test_melody_played_way_too_slow():
     assert tempo_deviation > 0.3
     assert tempo_deviation > tempo_tracker.allowed_tempo_deviation
     assert approx(tempo_tracker.current_bps * 60, 0.01) == 116  # no change in bpm, must be a bad note
+
+
+def test_chord_does_not_raise_divisionbyzero():
+    played_melody = copy.deepcopy(DEFAULT_MELODY)
+    played_melody[1] = 'E/9999'  # was 'E/2'
+    tempo_tracker = TempoTracker(DEFAULT_RHYTHM, tempo_bpm=116, allowed_tempo_deviation=0.05)
+    for note in as_midi_file(played_melody, tempo_bpm=116).play():
+        _, tempo_deviation = tempo_tracker.process(note)
+    assert tempo_tracker.rhythm_idx == 2  # 3 notes have been received but only 2 count as part of the rhythm

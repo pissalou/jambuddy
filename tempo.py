@@ -34,6 +34,8 @@ class TempoTracker(threading.Thread):
             previous_note_expected_length = self.rhythm[self.rhythm_idx % len(self.rhythm) - 1]  # length is a fraction
             previous_note_expected_duration = self._fraction2second(previous_note_expected_length)  # time in seconds
             seconds_since_previous_note = time.time() - self.previous_time
+            if seconds_since_previous_note == 0:
+                return 0, 1
             calculated_tempo_bps = (previous_note_expected_length / seconds_since_previous_note)
             logging.debug(f'Calculated tempo: {round(calculated_tempo_bps * 60)}bpm')
             tempo_deviation = abs(self.current_bps - calculated_tempo_bps) / self.current_bps if self.current_bps != 0 else 0

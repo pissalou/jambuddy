@@ -63,10 +63,6 @@ def test_melody_played_as_expected():
     port_mock.send.assert_has_calls([call(midi_msg) for midi_msg in as_midi_performance(played_melody)])
 
 
-# TODO test_chord_does_not_raise_divisionbyzero
-#   File "C:\code\mido-melody-extractor\tempo.py", line 37, in process
-#     calculated_tempo_bps = (previous_note_expected_length / seconds_since_previous_note)
-
 def test_melody_played_with_omission():
     played_melody = copy.deepcopy(DEFAULT_MELODY)
     played_melody[4] = 'G/2'  # was 'G/4'
@@ -76,5 +72,8 @@ def test_melody_played_with_omission():
     performance_tracker.port_out = port_mock
     for note in as_midi_file(played_melody).play():
         performance_tracker.process(note)
-    assert len(performance_tracker.errors) == 1
     port_mock.send.assert_has_calls([call(midi_msg) for midi_msg in as_midi_performance(played_melody)])
+    assert len(performance_tracker.errors) == 1
+    assert performance_tracker.errors[0].error_type == 'note_omission'  # error type is one of omission, insertion, substitution
+    assert performance_tracker.errors[0].expected_note == abc2midi('G^/4')  # G^/4
+    assert performance_tracker.errors[0].expected_time == 1234  # in ticks

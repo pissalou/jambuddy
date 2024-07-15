@@ -3,6 +3,7 @@ import threading
 import mido
 from midiplayback import MidiPlayback
 from performance import PerformanceTracker
+from abccoloramaview import AbcColoramaView
 import globals
 
 
@@ -13,9 +14,11 @@ print(f'Input devices: {mido.get_input_names()}')
 port_in = mido.open_input(mido.get_input_names()[0])
 
 
-mid = MidiPlayback("C:\\Users\\mazars\\Downloads\\The Blues Brothers-Peter Gunn Theme.mid", melody_track=1, start_position=2)
+mid = MidiPlayback("C:\\Users\\mazars\\Downloads\\The Blues Brothers-Peter Gunn Theme.mid", melody_track=1, start_position=1)  # beat #2 is position 1
 # melody = ["E/2", "E/2", "^F/2", "E/2", "G/4", "^G/4", "E/2", "A/2", "^G/2"]
-melody = ["E/2", "E/2", "E/2", "E/2"]  # Super simplified melody
+# melody = ["E/2", "E/2", "E/2", "E/2"]  # Super simplified melody
+melody = ["E/2", "E/2", "^F/2", "E/2", "G/2", "E/2", "A/2", "^G/2"]  # Simplified melody
+view = AbcColoramaView(melody, start_position=1, repeat=24)  # beat #2 is position 1
 
 
 def playback():
@@ -26,6 +29,7 @@ def playback():
 def midi_message_received_callback(self: PerformanceTracker):
     if self.melody_note_idx == 3 and not self.playback_started:
         self.playback_started = True
+        view.start()
         playback_thread = threading.Thread(target=playback)
         playback_thread.start()
 
