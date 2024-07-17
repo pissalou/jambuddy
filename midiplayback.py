@@ -1,6 +1,6 @@
 from mido import MidiFile, MidiTrack, tick2second, bpm2tempo, tempo2bpm, merge_tracks
 import sys
-import globals
+import state
 
 
 def _first_note_time(track: MidiTrack):
@@ -42,7 +42,7 @@ class MidiPlayback(MidiFile):
                 first_note_encountered = True
             # Convert message time from absolute time in ticks to relative time in seconds.
             if msg.time > 0:
-                delta = tick2second(msg.time, self.ticks_per_beat, bpm2tempo(globals.current_bpm))
+                delta = tick2second(msg.time, self.ticks_per_beat, bpm2tempo(state.current_bpm))
             else:
                 delta = 0
             # print('\r%5.2f'% (absolute_time / self.ticks_per_beat), end='')

@@ -4,7 +4,7 @@ import mido
 from midiplayback import MidiPlayback
 from performance import PerformanceTracker
 from abccoloramaview import AbcColoramaView
-import globals
+import state
 
 
 # IMPORTANT plug a midi keyboard at this point
@@ -34,5 +34,5 @@ def midi_message_received_callback(self: PerformanceTracker):
         playback_thread.start()
 
 
-performance_tracker = PerformanceTracker(expected_melody=melody, tempo_bpm=globals.current_bpm, port_in=port_in, port_out=port_out, midi_message_received_callback=midi_message_received_callback)
+performance_tracker = PerformanceTracker(expected_melody=melody, tempo_bpm=state.current_bpm, port_in=port_in, port_out=port_out, midi_message_received_callback=midi_message_received_callback)
 performance_tracker.start()

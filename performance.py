@@ -6,7 +6,7 @@ from mido import Message
 from tempo import TempoTracker
 from abccoloramaview import AbcColoramaView
 from abcutils import abc2beatcount
-import globals
+import state
 
 
 def filtered_receive(port, message_types=('note_on', 'note_off')):
@@ -18,7 +18,7 @@ def filtered_receive(port, message_types=('note_on', 'note_off')):
 
 class PerformanceTracker(threading.Thread):
 
-    def __init__(self, expected_melody, tempo_bpm=120, port_in=None, port_out=None, midi_message_received_callback: typing.Callable = None):
+    def __init__(self, expected_melody, tempo_bpm=120, port_in=None, port_out=None, midi_message_received_callback: typing.Optional[typing.Callable] = None):
         super().__init__()
         self.melody = expected_melody
         self.tempo_bps = tempo_bpm / 60
@@ -52,7 +52,7 @@ class PerformanceTracker(threading.Thread):
         self.port_out.send(received_event)
         self.melody_note_idx = (self.melody_note_idx + 1) % len(self.melody)
         # start playing the other tracks at the calculated tempo
-        globals.current_bpm = self.current_bps * 60
+        state.current_bpm = self.current_bps * 60
         if self.midi_message_received_callback is not None:
             self.midi_message_received_callback(self)
 
