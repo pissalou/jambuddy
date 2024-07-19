@@ -38,7 +38,7 @@ class MidiPlayback(MidiFile):
             if absolute_time >= self.stop_position:
                 return
             if absolute_time >= self.start_position and not first_note_encountered:
-                msg.time = 0  # reset delta from previous note: the first note in the playback will start immediately
+                msg.time = self.start_position - absolute_time  # recalculate delta from start pos instead of previous note
                 first_note_encountered = True
             # Convert message time from absolute time in ticks to relative time in seconds.
             if msg.time > 0:

@@ -18,7 +18,7 @@ mid = MidiPlayback("C:\\Users\\mazars\\Downloads\\The Blues Brothers-Peter Gunn 
 # melody = ["E/2", "E/2", "^F/2", "E/2", "G/4", "^G/4", "E/2", "A/2", "^G/2"]
 # melody = ["E/2", "E/2", "E/2", "E/2"]  # Super simplified melody
 melody = ["E/2", "E/2", "^F/2", "E/2", "G/2", "E/2", "A/2", "^G/2"]  # Simplified melody
-view = AbcColoramaView(melody, start_position=1, repeat=24)  # beat #2 is position 1
+view = AbcColoramaView(melody, start_position=2, repeat=48)  # TODO beat #2 is position 2?
 
 
 def playback():
@@ -36,3 +36,5 @@ def midi_message_received_callback(self: PerformanceTracker):
 
 performance_tracker = PerformanceTracker(expected_melody=melody, tempo_bpm=state.current_bpm, port_in=port_in, port_out=port_out, midi_message_received_callback=midi_message_received_callback)
 performance_tracker.start()
+# TODO: support killing the process with ctrl+c
+performance_tracker.join()

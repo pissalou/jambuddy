@@ -8,6 +8,10 @@ from abccoloramaview import AbcColoramaView
 from abcutils import abc2beatcount
 import state
 
+import logging
+logging.basicConfig(filename='latestperformance.log', filemode='w', format='%(message)s', level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 
 def filtered_receive(port, message_types=('note_on', 'note_off')):
     received_event = port.process()
@@ -30,12 +34,12 @@ class PerformanceTracker(threading.Thread):
         self.playback_started = False
         self.midi_message_received_callback = midi_message_received_callback
         self.tempo_tracker = TempoTracker([abc2beatcount(note) for note in expected_melody], tempo_bpm)
-        self.view = AbcColoramaView(melody=expected_melody, bpm=tempo_bpm)
 
     def _fraction2second(self, fraction: Fraction) -> float:
         return fraction / self.current_bps
 
     def process(self, midi_msg: Message):
+        logger.debug('<- %s', midi_msg)
         print(f'\rExpecting {self.melody[self.melody_note_idx]}\tCalculated tempo: {self.current_bps * 60:.2f}', end='')
         # print(f'Expecting note {melody[melody_note_idx].note} in    {expected_note_duration if melody_note_idx != 0 else 0:.2f}s...')
         received_event = midi_msg
@@ -45,14 +49,16 @@ class PerformanceTracker(threading.Thread):
             return
         if self.melody_note_idx == 0 and self.previous_time == 0:
             self.previous_time = time.time()  # start measuring time
-        calculated_tempo_bps, tempo_deviation = self.tempo_tracker.process(midi_msg)
-        print(f'-- {calculated_tempo_bps * 60:.2f} deviation {round(tempo_deviation * 100)}%', end='')
-        if tempo_deviation < 0.3:  # TODO not duplicate logic from tempo tracker
+        calculated_tempo_bps = self.tempo_tracker.process(midi_msg)
+        tempo_deviation = (state.current_bpm - calculated_tempo_bps * 60) / state.current_bpm
+        print(f' -- {round(calculated_tempo_bps * 60):0=3}bpm - deviation {round(tempo_deviation * 100):0=+5}%', end='')
+        if abs(tempo_deviation) < 0.3:  # TODO make allowed_tempo_deviation configurable
             self.current_bps = calculated_tempo_bps
-        self.port_out.send(received_event)
-        self.melody_note_idx = (self.melody_note_idx + 1) % len(self.melody)
         # start playing the other tracks at the calculated tempo
         state.current_bpm = self.current_bps * 60
+        logger.info('current.bpm: %f', state.current_bpm)
+        self.port_out.send(received_event)  # TODO: reorder lines of code to improve UX?
+        self.melody_note_idx = (self.melody_note_idx + 1) % len(self.melody)
         if self.midi_message_received_callback is not None:
             self.midi_message_received_callback(self)
 
