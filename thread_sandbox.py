@@ -1,7 +1,7 @@
 import threading
 import time
-# TODO: use mutex to avoid printing beats in wrong sequence
-c = threading.Condition()
+# Sync threads so they wait for each other before printing a newline
+barrier = threading.Barrier(parties=2)
 #########################################################
 # static variables shared between Thread_A and Thread_B #
 bpm = 120                                               #
@@ -15,15 +15,13 @@ class BeatCounterThread(threading.Thread):
         self.name = name
 
     def run(self):
-        global bpm, beatcnt  # use global here
+        global beatcnt, bpm, barrier   # use global here
         while True:
-            # c.acquire()
             print("%d" % ((beatcnt % 4) + 1), end='')
             time.sleep(60 / bpm)
             beatcnt = beatcnt + 1
-            # c.notify_all()
-            # c.wait()
-            # c.release()
+            if beatcnt % 4 == 3:
+                barrier.wait()
 
 
 class TempoHastenerThread(threading.Thread):
@@ -32,15 +30,12 @@ class TempoHastenerThread(threading.Thread):
         self.name = name
 
     def run(self):
-        global bpm  # use global here
+        global bpm, barrier  # use global here
         while True:
-            # c.acquire()
+            barrier.wait()
             print("")  # print new line
             time.sleep((4 * 60) / bpm)
             bpm = bpm + 5
-            # c.notify_all()
-            # c.wait()
-            # c.release()
 
 
 a = BeatCounterThread("counting1to4")

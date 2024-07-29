@@ -68,5 +68,11 @@ class PerformanceTracker(threading.Thread):
 
     def run(self):
         while True:
-            msg = self.port_in.receive()
-            self.process(msg)
+            if self.port_in is not None:
+                msg = self.port_in.receive()
+                self.process(msg)
+            else:  # trigger playback at 120bpm
+                self.process(Message(type="note_on", note=52, velocity=1, time=0.25))
+                time.sleep(0.25)
+                self.process(Message(type="note_on", note=52, velocity=1, time=0.25))
+                time.sleep(0.25)
