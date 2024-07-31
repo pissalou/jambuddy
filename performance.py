@@ -30,7 +30,6 @@ class PerformanceTracker(threading.Thread):
         self.port_in = port_in
         self.port_out = port_out
         self.melody_note_idx = 0
-        self.previous_time = 0.0
         self.playback_started = False
         self.midi_message_received_callback = midi_message_received_callback
         self.tempo_tracker = TempoTracker([abc2beatcount(note) for note in expected_melody], tempo_bpm)
@@ -47,8 +46,6 @@ class PerformanceTracker(threading.Thread):
             self.port_out.send(received_event)
             # print(f' {self.current_bps * 60:.2f}', end='')
             return
-        if self.melody_note_idx == 0 and self.previous_time == 0:
-            self.previous_time = time.time()  # start measuring time
         calculated_tempo_bps = self.tempo_tracker.process(midi_msg)
         tempo_deviation = (state.current_bpm - calculated_tempo_bps * 60) / state.current_bpm
         print(f' -- {round(calculated_tempo_bps * 60):0=3}bpm - deviation {round(tempo_deviation * 100):0=+5}%', end='')
@@ -72,7 +69,5 @@ class PerformanceTracker(threading.Thread):
                 msg = self.port_in.receive()
                 self.process(msg)
             else:  # trigger playback at 120bpm
-                self.process(Message(type="note_on", note=52, velocity=1, time=0.25))
-                time.sleep(0.25)
                 self.process(Message(type="note_on", note=52, velocity=1, time=0.25))
                 time.sleep(0.25)

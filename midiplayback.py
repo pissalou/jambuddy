@@ -1,7 +1,7 @@
-from mido import MidiFile, MidiTrack, tick2second, bpm2tempo, tempo2bpm, merge_tracks
+from mido import MidiFile, MidiTrack, MetaMessage, tick2second, bpm2tempo, tempo2bpm, merge_tracks
 import sys
 import state
-
+from clock import highres_sleep as sleep
 
 def _first_note_time(track: MidiTrack):
     absolute_time = 0  # in ticks
@@ -41,14 +41,32 @@ class MidiPlayback(MidiFile):
                 msg.time = self.start_position - absolute_time  # recalculate delta from start pos instead of previous note
                 first_note_encountered = True
             # Convert message time from absolute time in ticks to relative time in seconds.
-            if msg.time > 0:
-                delta = tick2second(msg.time, self.ticks_per_beat, bpm2tempo(state.current_bpm))
-            else:
-                delta = 0
+            # if msg.time > 0:
+            #     delta = tick2second(msg.time, self.ticks_per_beat, bpm2tempo(state.current_bpm))
+            # else:
+            #     delta = 0
             # print('\r%5.2f'% (absolute_time / self.ticks_per_beat), end='')
-            yield msg.copy(skip_checks=True, time=delta)
+            yield msg.copy(skip_checks=True)
             # yield MetaMessage(**vars(msg)) if msg.is_meta else Message(**(vars(msg) | {'data': absolute_time}))
 
-            # TODO: support tempo changes
+            # TODO: support tempo changes relative to the current tempo
             # if msg.type == 'set_tempo':
             #     current_bpm = tempo2bpm(msg.tempo)
+
+    def play(self, meta_messages=False, now=lambda: 0):
+        start_time = now()
+        input_time = 0.0
+
+        for msg in self:
+            input_time += msg.time
+
+            playback_time = now() - start_time
+            duration_to_next_event = input_time - playback_time
+
+            if duration_to_next_event > 0.0:
+                sleep(tick2second(msg.time, self.ticks_per_beat, bpm2tempo(state.current_bpm)))
+
+            if isinstance(msg, MetaMessage) and not meta_messages:
+                continue
+            else:
+                yield msg

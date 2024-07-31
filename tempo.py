@@ -37,12 +37,12 @@ class TempoTracker(threading.Thread):
         if midi_msg.type != 'note_on':
             # logger.info('%s: %d %f%%', self, round(self.previous_tempo_deviation * 60))
             return None
-        calculated_tempo_bps = 0
+        calculated_tempo_bps = 0.0
         if self.rhythm_idx != 0 and self.previous_time is not None:
             previous_note_expected_length = self.rhythm[self.rhythm_idx % len(self.rhythm) - 1]  # length is a fraction
             seconds_since_previous_note = time.time() - self.previous_time
             if seconds_since_previous_note == 0:
-                logger.info('%s: %d', self, 0)
+                logger.info('%s: %d', self, 0.0)
                 return 0.0
             calculated_tempo_bps = (previous_note_expected_length / seconds_since_previous_note)
             self.current_bps = calculated_tempo_bps
@@ -50,7 +50,7 @@ class TempoTracker(threading.Thread):
         self.previous_time = time.time()
         self.rhythm_idx += 1
         logger.info('%s: %d', self, round(calculated_tempo_bps * 60))
-        return calculated_tempo_bps
+        return calculated_tempo_bps + 0.0125  # mean([2.0, calculated_tempo_bps])
 
     def _fraction2second(self, fraction: Fraction) -> float:
         return fraction / self.current_bps
