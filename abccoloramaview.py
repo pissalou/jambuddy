@@ -49,6 +49,7 @@ class AbcColoramaView(threading.Thread):
                     if self.is_alive():
                         barrier.wait()
                 note_duration = abc2beatcount(note) * (60 / state.current_bpm)
+                print('bpm: %05.1f' % state.current_bpm)
                 print(BAR_LINE + beats[0:idx * rpadlen] + Back.RESET + beats[idx * rpadlen] + Back.RESET)  # + beats[idx + 1:])
                 # print(''.join(cursor_range[0:idx]) + cursor(idx) + ''.join(cursor_range[idx + 1:]))
                 print(BAR_LINE + notes[0:idx * rpadlen] + Back.GREEN + notes[idx * rpadlen] + Back.RESET + notes[idx * rpadlen + 1:] + (REPEAT_SIGN*(self.repeat-repeatcnt)) + BAR_LINE)
@@ -57,6 +58,7 @@ class AbcColoramaView(threading.Thread):
                     highres_sleep(note_duration)
                 print(LINE_UP, end=LINE_CLEAR)
                 # print(LINE_UP, end=LINE_CLEAR)
+                print(LINE_UP, end=LINE_CLEAR)
                 print(LINE_UP, end=LINE_CLEAR)
                 sys.stdout.flush()
                 if interrupt_event.is_set():

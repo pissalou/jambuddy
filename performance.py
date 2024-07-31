@@ -39,7 +39,7 @@ class PerformanceTracker(threading.Thread):
 
     def process(self, midi_msg: Message):
         logger.debug('<- %s', midi_msg)
-        print(f'\rExpecting {self.melody[self.melody_note_idx]}\tCalculated tempo: {self.current_bps * 60:.2f}', end='')
+        logger.debug(f'\rExpecting {self.melody[self.melody_note_idx]}\tCalculated tempo: {self.current_bps * 60:.2f}')
         # print(f'Expecting note {melody[melody_note_idx].note} in    {expected_note_duration if melody_note_idx != 0 else 0:.2f}s...')
         received_event = midi_msg
         if received_event.type == 'note_off':
@@ -48,7 +48,7 @@ class PerformanceTracker(threading.Thread):
             return
         calculated_tempo_bps = self.tempo_tracker.process(midi_msg)
         tempo_deviation = (state.current_bpm - calculated_tempo_bps * 60) / state.current_bpm
-        print(f' -- {round(calculated_tempo_bps * 60):0=3}bpm - deviation {round(tempo_deviation * 100):0=+5}%', end='')
+        logger.debug(f' -- {round(calculated_tempo_bps * 60):0=3}bpm - deviation {round(tempo_deviation * 100):0=+5}%')
         if abs(tempo_deviation) < 0.3:  # TODO make allowed_tempo_deviation configurable
             self.current_bps = calculated_tempo_bps
         # start playing the other tracks at the calculated tempo
