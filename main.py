@@ -1,6 +1,5 @@
 import logging
 import threading
-import keyboard
 import mido
 import os
 from midiplayback import MidiPlayback
@@ -53,7 +52,9 @@ def midi_message_received_callback(self: PerformanceTracker):
         playback_thread.start()
 
 
-keyboard.add_hotkey('ctrl+c', lambda: os._exit(0))
+if os.name == 'nt':  # Windows detected
+    import keyboard
+    keyboard.add_hotkey('ctrl+c', lambda: os._exit(0))
 performance_tracker = PerformanceTracker(expected_melody=melody, tempo_bpm=state.current_bpm, port_in=port_in, port_out=port_out, midi_message_received_callback=midi_message_received_callback)
 performance_tracker.daemon = True
 performance_tracker.start()
