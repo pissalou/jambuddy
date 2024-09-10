@@ -2,6 +2,7 @@ JAMBUDDY
 ========
 Based on the mido library. See https://mido.readthedocs.io/en/stable/
 
+cd /c/code/mido-melody-extractor && source venv/Scripts/activate && python -u -m main
 
 Getting started:
 ----------------

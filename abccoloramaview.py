@@ -52,7 +52,7 @@ class AbcColoramaView(threading.Thread):
                 print('bpm: %05.1f' % state.current_bpm)
                 print(BAR_LINE + beats[0:idx * rpadlen] + Back.RESET + beats[idx * rpadlen] + Back.RESET)  # + beats[idx + 1:])
                 # print(''.join(cursor_range[0:idx]) + cursor(idx) + ''.join(cursor_range[idx + 1:]))
-                print(BAR_LINE + notes[0:idx * rpadlen] + Back.GREEN + notes[idx * rpadlen] + Back.RESET + notes[idx * rpadlen + 1:] + (REPEAT_SIGN*(self.repeat-repeatcnt)) + BAR_LINE)
+                print(BAR_LINE + notes[0:idx * rpadlen] + Back.GREEN + notes[idx * rpadlen] + Back.RESET + notes[idx * rpadlen + 1:] + (REPEAT_SIGN * (self.repeat - repeatcnt)) + BAR_LINE)
                 sys.stdout.flush()
                 if note_duration > 0.0 and (repeatcnt != 0 or idx >= self.start_position):
                     highres_sleep(note_duration)

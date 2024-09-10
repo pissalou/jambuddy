@@ -3,6 +3,7 @@ import sys
 import state
 from clock import highres_sleep as sleep
 
+
 def _first_note_time(track: MidiTrack):
     absolute_time = 0  # in ticks
     for msg in track:
