@@ -2,6 +2,21 @@ import re
 import mido
 from fractions import Fraction
 
+BEAT_SEPARATOR_MAP = {
+    1: ' ',  # key is the note length, value is the text to insert between each beat
+    2: ' & ',
+    3: '-triplet ',
+    4: ' e & a ',
+}
+
+
+def measure_to_beats(measure: list, time_signature: tuple = (4, 4)):
+    note_lengths = [Fraction(abc2beatcount(note)) for note in measure]
+    # find the shortest note length to define the resolution of our beats
+    note_length_denominator = min(note_lengths).denominator  # TODO look for a common denominator, not the smallest one
+    separator = BEAT_SEPARATOR_MAP[note_length_denominator]
+    return separator.join(map(str, range(1, time_signature[1] + 1))) + separator
+
 
 def abc2beatcount(txt, note_length=1) -> float:
     """
@@ -15,9 +30,9 @@ def abc2beatcount(txt, note_length=1) -> float:
         notes[idx] = re.sub(r'/+$', '/' + str(notes[idx].count('/') * 2), notes[idx])
         notes[idx] = re.sub(r'[A-Ga-gz][,\']*(?!\d)', '1', notes[idx])
         notes[idx] = re.sub(r'[A-Ga-gz][,\']*(?=\d)', '', notes[idx])
-    expr = '+'.join(notes)
+    return sum(map(Fraction, notes))
     # print(f'Evaluating "{expr}"')
-    return eval(expr)
+    # return Fraction(expr)
 
 
 ACCIDENTALS_TO_SCALE = {

@@ -1,6 +1,16 @@
-from abcutils import abc2beatcount, abc2midi
+from abcutils import abc2beatcount, abc2midi, measure_to_beats
 from mido import Message
 from fractions import Fraction
+
+
+def test_measure_to_beats():
+    assert '1 2 3 4 ' == measure_to_beats(['A', 'B', 'C', 'D'])
+    assert '1 & 2 & 3 & 4 & ' == measure_to_beats(['A/2', 'B3/2', 'C', 'D'])
+    assert '1 e & a 2 e & a 3 e & a 4 e & a ' == measure_to_beats(['A/4', 'B3/4', 'C', 'D'])
+
+
+def test_triplet_measure_to_beats():
+    assert '1-triplet 2-triplet 3-triplet 4-triplet ' == measure_to_beats(['A/3', 'B/3', 'C/3', 'D3'])
 
 
 def test_abc2beatcount():
