@@ -16,7 +16,7 @@ jobs:
         run: pip install -r requirements.txt
 
       # Build an executable from your Python code (standalone *.exe or *.bin file executables and even .app bundles for Mac)
-      - uses: Nuitka/Nuitka-Action@main
+      - uses: Nuitka/Nuitka-Action@factory
         with:
           nuitka-version: main
           script-name: qtsvg.py
