@@ -28,5 +28,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: exe
-          path: build/qtsvg.exe
+          path: build/qtsvg.dist/qtsvg.exe
           include-hidden-files: true
