@@ -1,37 +1,68 @@
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, Qt
+from pugixml import pugi
+import verovio
 import sys
 import time
 
-curr_color = 'red'
-next_color = 'green'
-svg_data = '<svg height="100" width="100" xmlns="http://www.w3.org/2000/svg"><circle r="45" cx="50" cy="50" fill="red"/></svg>'
+tk = verovio.toolkit()
+doc = pugi.XMLDocument()
+svg_data = ('<svg width="400" height="100" xmlns="http://www.w3.org/2000/svg">'
+            '<style type="text/css">circle { fill: "dimgray" } circle.active { fill: "green" }</style>'
+            '<circle r="45" cx="050" cy="50" class="active" />'
+            '<circle r="45" cx="150" cy="50" />'
+            '<circle r="45" cx="250" cy="50" />'
+            '<circle r="45" cx="350" cy="50" />'
+            '</svg>')
+
+
+def precise_timer(parent, msec: int, functor):
+    timer = QTimer(parent)
+    timer.setTimerType(Qt.PreciseTimer)
+    timer.timeout.connect(functor)
+    timer.setSingleShot(True)
+    timer.start(msec)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     # svg_data = Path('Zeichen_123.svg').read_text()
     svgWidget = QSvgWidget()
+    svgWidget.setWindowTitle('Visual Metronome [bpm=120]')
     svgWidget.renderer().load(bytearray(svg_data, encoding='UTF-8'))
-    svgWidget.setGeometry(50, 50, 100, 100)
+    svgWidget.setGeometry(0, 0, 400, 100)
     svgWidget.show()
     # print("show")
     prevtime = time.time()
+    beatcnt = 0
 
-    def toggle_color():
-        global curr_color
-        global next_color
+    def update_beat():
+        global beatcnt
         global prevtime
         global svg_data
-        svg_data = svg_data.replace(curr_color, next_color)
+
+        # svg_data = svg_data.replace("active", "passive")
+        result = doc.load_string(svg_data)
+        if result.status == pugi.STATUS_OK:
+            [elem.node().remove_attribute('class') for elem in doc.select_nodes(f"/svg/circle")]  # reset active class
+            doc.select_node(f"/svg/circle[{(beatcnt  % 4) + 1}]").node().append_attribute('class').set_value('active')
+            xml_writer = pugi.StringWriter()
+            doc.save(writer=xml_writer, flags=pugi.FORMAT_RAW, encoding=pugi.ENCODING_UTF8)
+            svg_data = xml_writer.getvalue()
+            beatcnt = beatcnt+1
+        else:
+            exit(123)
+
         svgWidget.renderer().load(bytearray(svg_data, encoding='UTF-8'))
         svgWidget.update()
         currtime = time.time()
-        # print(f"update {curr_color}->{next_color} @ {currtime - prevtime}")
+        # print(f"beat {beatcnt} [duration={(currtime - prevtime):0.4f}ms]")
         prevtime = currtime
-        temp_color = next_color; next_color = curr_color; curr_color = temp_color  # the old switcheroo
-        QTimer.singleShot(500, lambda: toggle_color())  # recurse every .5 sec
-    #  time.sleep(1)  # cannot block the main thread when using Qt
-    QTimer.singleShot(500, lambda: toggle_color())
+        # sQTimer.singleShot(500, lambda: toggle_color())  # recurse every .5 sec
+        precise_timer(app, 500, lambda: update_beat())
+    # time.sleep(1)  # cannot block the main thread when using Qt
+    # QTimer.singleShot(500, lambda: toggle_color())
+    precise_timer(app, 500, lambda: update_beat())
 
     sys.exit(app.exec())

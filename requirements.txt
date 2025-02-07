@@ -7,3 +7,5 @@ pytest
 pytest-mock
 PySide6==6.8.0.1  # for Qt (TODO: downgrade to 6.5? what about PyQt6?)
 pytest-qt
+verovio
+pugixml         # used by verovio for xlm processing (supports xpath 1.0)
