@@ -2,6 +2,7 @@ from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QTimer, Qt
 from pugixml import pugi
+import mido
 import verovio
 import sys
 import time
@@ -26,6 +27,8 @@ def precise_timer(parent, msec: int, functor):
 
 
 if __name__ == "__main__":
+    global port
+    port = mido.open_output(mido.get_output_names()[0])
     app = QApplication(sys.argv)
     # svg_data = Path('Zeichen_123.svg').read_text()
     svgWidget = QSvgWidget()
@@ -41,7 +44,10 @@ if __name__ == "__main__":
         global beatcnt
         global prevtime
         global svg_data
+        global port
 
+        port.send(mido.Message('note_off', note=34 if beatcnt % 4 == 3 else 32, channel=9))
+        port.send(mido.Message('note_on', note=34 if beatcnt % 4 == 0 else 32, channel=9))
         # svg_data = svg_data.replace("active", "passive")
         result = doc.load_string(svg_data)
         if result.status == pugi.STATUS_OK:
@@ -59,10 +65,10 @@ if __name__ == "__main__":
         currtime = time.time()
         # print(f"beat {beatcnt} [duration={(currtime - prevtime):0.4f}ms]")
         prevtime = currtime
-        # sQTimer.singleShot(500, lambda: toggle_color())  # recurse every .5 sec
+        # QTimer.singleShot(500, lambda: update_beat())  # recurse every .5 sec
         precise_timer(app, 500, lambda: update_beat())
     # time.sleep(1)  # cannot block the main thread when using Qt
-    # QTimer.singleShot(500, lambda: toggle_color())
+    # QTimer.singleShot(500, lambda: update_beat())
     precise_timer(app, 500, lambda: update_beat())
 
     sys.exit(app.exec())
