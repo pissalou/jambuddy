@@ -22,7 +22,7 @@ jobs:
           nuitka-version: factory
           script-name: |
             qtsvg.py
-            qtverovio*.py
+            qtverovio2.py
           mode: standalone
           enable-plugins: pyside6
       # Uploads artifact

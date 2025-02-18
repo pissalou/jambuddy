@@ -1,8 +1,13 @@
+import sys
+from typing import Any
+import mido
 from PySide6 import QtWebEngineWidgets
 from PySide6.QtWidgets import QApplication, QMainWindow
-import sys
 from abc2svg_utils import abc2svg
 from qtimerutils import precise_timer
+from xmlutils import foreach_node
+
+global port  # midi out port
 
 
 class JambudWindow(QMainWindow):
@@ -33,7 +38,9 @@ class JambudWindow(QMainWindow):
 
     def _update_beat(self, beatcnt: int):
         print(str((beatcnt % 4) + 1), end='' if beatcnt % 4 != 3 else '\n')
-        from xmlutils import foreach_node
+        # metronome.click(bell=(beatcnt % 4 == 3))
+        port.send(mido.Message('note_off', note=34 if beatcnt % 4 == 3 else 32, channel=9))
+        port.send(mido.Message('note_on', note=34 if beatcnt % 4 == 0 else 32, channel=9))
         # TODO: see how verovio online editor is solving this
         self.svg = foreach_node(self.svg, "/svg//g[@class='note']//*[not(child::*)]",
                                 lambda node: node.remove_attribute('class'))
@@ -49,6 +56,7 @@ class JambudWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication()
     main_window = JambudWindow()
+    port = mido.open_output(mido.get_output_names()[0])
     # main_window.load_svg(Path('verovio-output.svg').read_bytes())
     main_window.load_abc(sys.argv[1] if len(sys.argv) > 1 else 'ABcd')
     # main_window.load_abc('AB[ceg]d') # TODO support chords
