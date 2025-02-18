@@ -20,7 +20,9 @@ jobs:
       - uses: Nuitka/Nuitka-Action@main
         with:
           nuitka-version: factory
-          script-name: qtsvg.py
+          script-name: |
+            qtsvg.py
+            qtverovio*.py
           mode: standalone
           enable-plugins: pyside6
       # Uploads artifact
