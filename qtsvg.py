@@ -3,11 +3,9 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QTimer, Qt
 from pugixml import pugi
 import mido
-import verovio
 import sys
 import time
 
-tk = verovio.toolkit()
 doc = pugi.XMLDocument()
 svg_data = ('<svg width="400" height="100" xmlns="http://www.w3.org/2000/svg">'
             '<style type="text/css">circle { fill: "dimgray" } circle.active { fill: "green" }</style>'

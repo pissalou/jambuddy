@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead/>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-1">
+                        <staffGrp xml:id="staffgrp-1">
+                            <staffDef xml:id="staffdef-g" clef.shape="G" clef.line="2" n="1" lines="5"/>
+                            <staffDef xml:id="staffdef-f" clef.shape="F" clef.line="4" n="2" lines="5"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-1">
+                        <measure xml:id="measure-1" n="0" right="end">
+                            <staff xml:id="staff-1" n="1">
+                                <layer xml:id="layer-1" n="1">
+                                    <chord xml:id="chord-1" dur="4" stem.len="0">
+                                        <note xml:id="note-96" pname="c" oct="7" visible="true"/>
+                                        <!-- 6th octave -->
+                                        <note xml:id="note-95" pname="b" oct="6" visible="true"/>
+                                        <note xml:id="note-94" pname="a" oct="6" accid="s" visible="true"/>
+                                        <note xml:id="note-93" pname="a" oct="6" visible="true"/>
+                                        <note xml:id="note-92" pname="g" oct="6" accid="s" visible="true"/>
+                                        <note xml:id="note-91" pname="g" oct="6" visible="true"/>
+                                        <note xml:id="note-90" pname="f" oct="6" accid="s" visible="true"/>
+                                        <note xml:id="note-89" pname="f" oct="6" visible="true"/>
+                                        <note xml:id="note-88" pname="e" oct="6" visible="true"/>
+                                        <note xml:id="note-87" pname="d" oct="6" accid="s" visible="true"/>
+                                        <note xml:id="note-86" pname="d" oct="6" visible="true"/>
+                                        <note xml:id="note-85" pname="c" oct="6" accid="s" visible="true"/>
+                                        <note xml:id="note-84" pname="c" oct="6" visible="true"/>
+                                        <!-- 5th octave -->
+                                        <note xml:id="note-83" pname="b" oct="5" visible="true"/>
+                                        <note xml:id="note-82" pname="a" oct="5" accid="s" visible="true"/>
+                                        <note xml:id="note-81" pname="a" oct="5" visible="true"/>
+                                        <note xml:id="note-80" pname="g" oct="5" accid="s" visible="true"/>
+                                        <note xml:id="note-79" pname="g" oct="5" visible="true"/>
+                                        <note xml:id="note-78" pname="f" oct="5" accid="s" visible="true"/>
+                                        <note xml:id="note-77" pname="f" oct="5" visible="true"/>
+                                        <note xml:id="note-76" pname="e" oct="5" visible="true"/>
+                                        <note xml:id="note-75" pname="d" oct="5" accid="s" visible="true"/>
+                                        <note xml:id="note-74" pname="d" oct="5" visible="true"/>
+                                        <note xml:id="note-73" pname="c" oct="5" accid="s" visible="true"/>
+                                        <note xml:id="note-72" pname="c" oct="5" visible="true"/>
+                                        <!-- 4th octave -->
+                                        <note xml:id="note-71" pname="b" oct="4" visible="true"/>
+                                        <note xml:id="note-70" pname="a" oct="4" accid="s" visible="true"/>
+                                        <note xml:id="note-69" pname="a" oct="4" visible="true"/>
+                                        <note xml:id="note-68" pname="g" oct="4" accid="s" visible="true"/>
+                                        <note xml:id="note-67" pname="g" oct="4" visible="true"/>
+                                        <note xml:id="note-66" pname="f" oct="4" accid="s" visible="true"/>
+                                        <note xml:id="note-65" pname="f" oct="4" visible="true"/>
+                                        <note xml:id="note-64" pname="e" oct="4" visible="true"/>
+                                        <note xml:id="note-63" pname="d" oct="4" accid="s" visible="true"/>
+                                        <note xml:id="note-62" pname="d" oct="4" visible="true"/>
+                                        <note xml:id="note-61" pname="c" oct="4" accid="s" visible="true"/>
+                                        <note xml:id="note-60" pname="c" oct="4" visible="true"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-2" n="2">
+                                <layer xml:id="layer-2" n="2">
+                                    <chord xml:id="chord-2" dur="4" stem.len="0">
+                                        <!-- 3rd octave -->
+                                        <note xml:id="note-59" pname="b" oct="3" visible="true"/>
+                                        <note xml:id="note-58" pname="a" oct="3" accid="s" visible="true"/>
+                                        <note xml:id="note-57" pname="a" oct="3" visible="true"/>
+                                        <note xml:id="note-56" pname="g" oct="3" accid="s" visible="true"/>
+                                        <note xml:id="note-55" pname="g" oct="3" visible="true"/>
+                                        <note xml:id="note-54" pname="f" oct="3" accid="s" visible="true"/>
+                                        <note xml:id="note-53" pname="f" oct="3" visible="true"/>
+                                        <note xml:id="note-52" pname="e" oct="3" visible="true"/>
+                                        <note xml:id="note-51" pname="d" oct="3" accid="s" visible="true"/>
+                                        <note xml:id="note-50" pname="d" oct="3" visible="true"/>
+                                        <note xml:id="note-49" pname="c" oct="3" accid="s" visible="true"/>
+                                        <note xml:id="note-48" pname="c" oct="3" visible="true"/>
+                                        <!-- 2nd octave -->
+                                        <note xml:id="note-47" pname="b" oct="2" visible="true"/>
+                                        <note xml:id="note-46" pname="a" oct="2" accid="s" visible="true"/>
+                                        <note xml:id="note-45" pname="a" oct="2" visible="true"/>
+                                        <note xml:id="note-44" pname="g" oct="2" accid="s" visible="true"/>
+                                        <note xml:id="note-43" pname="g" oct="2" visible="true"/>
+                                        <note xml:id="note-42" pname="f" oct="2" accid="s" visible="true"/>
+                                        <note xml:id="note-41" pname="f" oct="2" visible="true"/>
+                                        <note xml:id="note-40" pname="e" oct="2" visible="true"/>
+                                        <note xml:id="note-39" pname="d" oct="2" accid="s" visible="true"/>
+                                        <note xml:id="note-38" pname="d" oct="2" visible="true"/>
+                                        <note xml:id="note-37" pname="c" oct="2" accid="s" visible="true"/>
+                                        <note xml:id="note-36" pname="c" oct="2" visible="true"/>
+                                        <!-- 1st octave -->
+                                        <note xml:id="note-35" pname="b" oct="1" visible="true"/>
+                                        <note xml:id="note-34" pname="a" oct="1" accid="s" visible="true"/>
+                                        <note xml:id="note-33" pname="a" oct="1" visible="true"/>
+                                        <note xml:id="note-32" pname="g" oct="1" accid="s" visible="true"/>
+                                        <note xml:id="note-31" pname="g" oct="1" visible="true"/>
+                                        <note xml:id="note-30" pname="f" oct="1" accid="s" visible="true"/>
+                                        <note xml:id="note-29" pname="f" oct="1" visible="true"/>
+                                        <note xml:id="note-28" pname="e" oct="1" visible="true"/>
+                                        <note xml:id="note-27" pname="d" oct="1" accid="s" visible="true"/>
+                                        <note xml:id="note-26" pname="d" oct="1" visible="true"/>
+                                        <note xml:id="note-25" pname="c" oct="1" accid="s" visible="true"/>
+                                        <note xml:id="note-24" pname="c" oct="1" visible="true"/>
+                                        <!-- 0th octave -->
+                                        <note xml:id="note-23" pname="b" oct="0" visible="true"/>
+                                        <note xml:id="note-22" pname="a" oct="0" accid="s" visible="true"/>
+                                        <note xml:id="note-21" pname="a" oct="0" visible="true"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
